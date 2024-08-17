@@ -35,34 +35,46 @@ def parse_arguments():
 		svgo_path = shutil.which('svgo')
 
 
-def compress_svg(content):
+RE_FILL = re.compile(r'fill="[^"]*"')
+RE_XLINK_HREF = re.compile(r'xlink:href')
+RE_XMLNS_XLINK = re.compile(r'\s+xmlns:xlink="[^"]*"')
+RE_COMMENT = re.compile(r'<!--.*?-->', flags=re.DOTALL)
+RE_XML_TAG = re.compile(r'<\?xml.*?>', flags=re.DOTALL)
+RE_DOCTYPE_SVG = re.compile(r'<!DOCTYPE svg[^>]*>')
+RE_WHITESPACE = re.compile(r'\s+')
+RE_WHITESPACE_AROUND_TAGS = re.compile(r'\s*(<|>)\s*')
+RE_SYMBOLS_BETWEEN_TAGS = re.compile(r'>[^<]+<')
+RE_XML_SPACE = re.compile(r'\s+xml:space="[^"]+"')
+
+
+def compress_svg_content(content):
 	# Deleting whitespace at the ends
 	content = content.strip()
 	if args.remove_fill:
-		content = re.sub(r'fill="[^"]*"', '', content)
+		content = RE_FILL.sub('', content)
 	# If there is no xlink use, delete redundant attribute
-	if re.search(r'xlink:href', content) is None:
-		content = re.sub(r'\s+xmlns:xlink="[^"]*"', '', content)
+	if RE_XLINK_HREF.search(content) is None:
+		content = RE_XMLNS_XLINK.sub('', content)
 	# Deleting comments
-	content = re.sub(r'<!--.*?-->', '', content, flags=re.DOTALL)
+	content = RE_COMMENT.sub('', content)
 	# Deleting "<?xml" tag
-	content = re.sub(r'<\?xml.*?>', '', content, flags=re.DOTALL)
+	content = RE_XML_TAG.sub('', content)
 	# Deleting "<!DOCTYPE svg" tag
-	content = re.sub(r'<!DOCTYPE svg[^>]*>', '', content)
+	content = RE_DOCTYPE_SVG.sub('', content)
 	# Replacing whitespace with single space
-	content = re.sub(r'\s+', ' ', content)
+	content = RE_WHITESPACE.sub(' ', content)
 	# Removing spaces between angle brackets
-	content = re.sub(r'\s*(<|>)\s*', r'\1', content)
+	content = RE_WHITESPACE_AROUND_TAGS.sub(r'\1', content)
 	# If there are no other symbols between angle brackets, delete redundant attribute
-	if re.search(r'>[^<]+<', content) is None:
-		content = re.sub(r'\s+xml:space="[^"]+"', '', content)
+	if RE_SYMBOLS_BETWEEN_TAGS.search(content) is None:
+		content = RE_XML_SPACE.sub('', content)
 	return content
 
 
 def process_file(filepath):
 	with open(filepath, 'r', encoding='utf-8') as file:
 		content = file.read()
-	compressed_content = compress_svg(content)
+	compressed_content = compress_svg_content(content)
 	with open(filepath, 'w', encoding='utf-8') as file:
 		file.write(compressed_content)
 
