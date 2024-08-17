@@ -46,7 +46,7 @@ def compress_svg(content):
 	# Deleting comments
 	content = re.sub(r'<!--.*?-->', '', content, flags=re.DOTALL)
 	# Deleting "<?xml" tag
-	content = re.sub(r'<\?xml.*?>', '', content)
+	content = re.sub(r'<\?xml.*?>', '', content, flags=re.DOTALL)
 	# Deleting "<!DOCTYPE svg" tag
 	content = re.sub(r'<!DOCTYPE svg[^>]*>', '', content)
 	# Replacing whitespace with single space
