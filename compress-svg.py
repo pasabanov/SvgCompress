@@ -17,6 +17,8 @@ import re
 import shutil
 import subprocess
 
+from sys import stderr
+
 
 args = None
 svgo_path = None
@@ -25,7 +27,7 @@ gzip_path = None
 
 def parse_arguments():
 	global args, svgo_path, gzip_path
-	parser = argparse.ArgumentParser(description="Compress SVG files by removing unnecessary whitespace and comments.")
+	parser = argparse.ArgumentParser(description='Compress SVG files by removing unnecessary whitespace and comments.')
 	parser.add_argument('paths', nargs='+', help='List of directories or SVG files to compress.')
 	parser.add_argument('-v', '--version', action='version', version='SVG Compressor 1.0', help='Show the version of the script.')
 	parser.add_argument('-r', '--recursive', action='store_true', help='Recursively process directories.')
@@ -42,7 +44,7 @@ def parse_arguments():
 def simple_compress(filepath):
 
 	# Define regular expressions once and store them as attributes of the function
-	if not hasattr(simple_compress, "RE_FILL"):
+	if not hasattr(simple_compress, 'RE_FILL'):
 		simple_compress.RE_FILL = re.compile(r'fill="[^"]*"')
 		simple_compress.RE_XLINK_HREF = re.compile(r'xlink:href')
 		simple_compress.RE_XMLNS_XLINK = re.compile(r'\s+xmlns:xlink="[^"]*"')
@@ -87,14 +89,14 @@ def compress_to_svgz(filepath):
 		return
 	if not filepath.endswith('.svg'):
 		return
-	svgz_filepath = f"{filepath}z"
+	svgz_filepath = f'{filepath}z'
 	try:
 		with open(filepath, 'rb') as f_in:
 			with open(svgz_filepath, 'wb') as f_out:
 				subprocess.run([gzip_path, '-c', '-9'], stdin=f_in, stdout=f_out, check=True)
 		os.remove(filepath)
 	except subprocess.CalledProcessError as e:
-		print(f"Error compressing {filepath} to .svgz: {e}")
+		print(f'Error compressing {filepath} to .svgz: {e}', file=stderr)
 
 
 def traverse_directory(directory, target_function):
@@ -113,7 +115,7 @@ def process_path(path):
 	elif os.path.isdir(path):
 		is_directory = True
 	else:
-		print(f"Warning: {path} is neither an SVG file nor a directory.")
+		print(f'Error: {path} is neither an SVG file nor a directory.', file=stderr)
 		return
 
 	if is_directory:
@@ -129,7 +131,7 @@ def process_path(path):
 			subprocess.run(svgo_arguments, check=True)
 			subprocess.run(svgo_arguments, check=True) # Second time for additional optimization
 		except subprocess.CalledProcessError as e:
-			print(f'Error during SVGO optimization for {path}: {e}')
+			print(f'Error during SVGO optimization for {path}: {e}', file=stderr)
 
 	if args.svgz and gzip_path is not None:
 		if is_directory:
@@ -140,9 +142,9 @@ def process_path(path):
 
 def main():
 	if args.svgo and svgo_path is None:
-		print("Error: svgo executable not found in the system.")
+		print('Error: svgo executable not found in the system.', file=stderr)
 	if args.svgz and gzip_path is None:
-		print("Error: gzip executable not found in the system.")
+		print('Error: gzip executable not found in the system.', file=stderr)
 	for path in args.paths:
 		process_path(path)
 
