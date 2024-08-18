@@ -74,7 +74,7 @@ def simple_compress(filepath):
 	content = simple_compress.RE_DOCTYPE_SVG.sub('', content)
 	# Replacing whitespace with single space
 	content = simple_compress.RE_WHITESPACE.sub(' ', content)
-	# Removing spaces between angle brackets
+	# Removing spaces around angle brackets
 	content = simple_compress.RE_WHITESPACE_AROUND_TAGS.sub(r'\1', content)
 	# If there are no other symbols between angle brackets, delete redundant attribute
 	if simple_compress.RE_SYMBOLS_BETWEEN_TAGS.search(content) is None:
