@@ -2,7 +2,7 @@
 
 ## Description
 
-`SvgCompress` is a tool for compressing SVG files by removing unnecessary whitespace, comments, and optional attributes. It also supports optimization with SVGO if installed. The tool helps reduce the file size and clean up SVG files for better performance and preparing for release versions.
+`SvgCompress` is a tool for compressing SVG files by removing unnecessary whitespace, comments, and optional attributes. It also supports optimization with [SVGO](https://github.com/svg/svgo) if installed. The tool helps reduce the file size and clean up SVG files for better performance and preparing for release versions.
 
 ## Installation
 
@@ -13,11 +13,11 @@
     cd SvgCompress
     ```
 
-2. **(Optional) If you want to use `--svgo` option, make sure SVGO is installed.**
+2. **(Optional) If you want to use `--svgo` option, make sure [SVGO](https://github.com/svg/svgo) is installed.**
 
 ## Usage
 
-To compress SVG files and optionally use SVGO, run the script with the following command:
+To compress SVG files, run the script with the following command:
 
 ```sh
 python compress-svg.py [options] paths
@@ -29,8 +29,8 @@ python compress-svg.py [options] paths
 `-v`, `--version` Show the version of the script  
 `-r`, `--recursive` Recursively process directories  
 `-f`, `--remove-fill` Remove `fill="..."` attributes  
-`--svgo` Use SVGO if it exists in the system  
-`--svgz` Compress to .svgz format with gzip utility after processing
+`--svgo` Use [SVGO](https://github.com/svg/svgo) if it exists in the system  
+`--svgz` Compress to [.svgz](https://ru.wikipedia.org/wiki/SVG#SVGZ) format with [gzip](https://www.gnu.org/software/gzip/) utility after processing
 
 ## Examples
 1. Compress a single SVG file:
