@@ -15,6 +15,8 @@
 
 2. **(Optional) If you want to use `--svgo` option, make sure [SVGO](https://github.com/svg/svgo) is installed.**
 
+3. **(Optional) If you want to use `--svgz` option, make sure [gzip](https://www.gnu.org/software/gzip/) is installed.**
+
 ## Usage
 
 To compress SVG files, run the script with the following command:
