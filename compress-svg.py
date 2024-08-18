@@ -110,7 +110,7 @@ def main():
 	if args.svgz and not gzip_path:
 		print('Error: gzip executable not found in the system.', file=stderr)
 
-	svg_files = [file for path in args.paths for file in find_svg_files(path, args.recursive)]
+	svg_files = list(set(file for path in args.paths for file in find_svg_files(path, args.recursive)))
 
 	for file in svg_files:
 		simple_compress(file, args.remove_fill)
