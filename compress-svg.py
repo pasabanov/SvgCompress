@@ -20,28 +20,7 @@ import subprocess
 from sys import stderr
 
 
-args = None
-svgo_path = None
-gzip_path = None
-
-
-def parse_arguments():
-	global args, svgo_path, gzip_path
-	parser = argparse.ArgumentParser(description='Compress SVG files by removing unnecessary whitespace and comments.')
-	parser.add_argument('paths', nargs='+', help='List of directories or SVG files to compress.')
-	parser.add_argument('-v', '--version', action='version', version='SVG Compressor 1.0', help='Show the version of the script.')
-	parser.add_argument('-r', '--recursive', action='store_true', help='Recursively process directories.')
-	parser.add_argument('-f', '--remove-fill', action='store_true', help='Remove fill="..." attributes.')
-	parser.add_argument('--svgo', action='store_true', help='Use svgo if it exists in the system.')
-	parser.add_argument('--svgz', action='store_true', help='Compress to .svgz format with gzip utility after processing.')
-	args = parser.parse_args()
-	if args.svgo:
-		svgo_path = shutil.which('svgo')
-	if args.svgz:
-		gzip_path = shutil.which('gzip')
-
-
-def simple_compress(filepath):
+def simple_compress(filepath: str, remove_fill: bool):
 
 	# Define regular expressions once and store them as attributes of the function
 	if not hasattr(simple_compress, 'RE_FILL'):
@@ -52,7 +31,7 @@ def simple_compress(filepath):
 		simple_compress.RE_XML_TAG = re.compile(r'<\?xml.*?>', flags=re.DOTALL)
 		simple_compress.RE_DOCTYPE_SVG = re.compile(r'<!DOCTYPE svg[^>]*>')
 		simple_compress.RE_WHITESPACE = re.compile(r'\s+')
-		simple_compress.RE_WHITESPACE_AROUND_TAGS = re.compile(r'\s*(<|>)\s*')
+		simple_compress.RE_WHITESPACE_AROUND_TAGS = re.compile(r'\s*([<>])\s*')
 		simple_compress.RE_SYMBOLS_BETWEEN_TAGS = re.compile(r'>[^<]+<')
 		simple_compress.RE_XML_SPACE = re.compile(r'\s+xml:space="[^"]+"')
 
@@ -61,7 +40,7 @@ def simple_compress(filepath):
 
 	# Deleting whitespace at the ends
 	content = content.strip()
-	if args.remove_fill:
+	if remove_fill:
 		content = simple_compress.RE_FILL.sub('', content)
 	# If there is no xlink use, delete redundant attribute
 	if simple_compress.RE_XLINK_HREF.search(content) is None:
@@ -84,11 +63,8 @@ def simple_compress(filepath):
 		file.write(content)
 
 
-def compress_to_svgz(filepath):
-	if not args.svgz or gzip_path is None:
-		return
-	if not filepath.endswith('.svg'):
-		return
+def compress_to_svgz(filepath: str, gzip_path: str):
+	# Assuming that file ends with '.svg', so we add 'z' to get '.svgz'
 	svgz_filepath = f'{filepath}z'
 	try:
 		with open(filepath, 'rb') as f_in:
@@ -99,7 +75,7 @@ def compress_to_svgz(filepath):
 		print(f'Error compressing {filepath} to .svgz: {e}', file=stderr)
 
 
-def find_svg_files(path):
+def find_svg_files(path: str, recursive: bool):
 	if os.path.isfile(path) and path.endswith('.svg'):
 		return [path]
 	elif not os.path.isdir(path):
@@ -110,23 +86,36 @@ def find_svg_files(path):
 		for filename in files:
 			if filename.endswith('.svg'):
 				svg_files.append(os.path.join(root, filename))
-		if not args.recursive:
+		if not recursive:
 			break
 	return svg_files
 
 
 def main():
-	if args.svgo and svgo_path is None:
+	parser = argparse.ArgumentParser(description='Compress SVG files by removing unnecessary whitespace and comments.')
+	parser.add_argument('paths', nargs='+', help='List of directories or SVG files to compress.')
+	parser.add_argument('-v', '--version', action='version', version='SVG Compressor 1.0', help='Show the version of the script.')
+	parser.add_argument('-r', '--recursive', action='store_true', help='Recursively process directories.')
+	parser.add_argument('-f', '--remove-fill', action='store_true', help='Remove fill="..." attributes.')
+	parser.add_argument('--svgo', action='store_true', help='Use svgo if it exists in the system.')
+	parser.add_argument('--svgz', action='store_true', help='Compress to .svgz format with gzip utility after processing.')
+
+	args = parser.parse_args()
+
+	svgo_path = shutil.which('svgo') if args.svgo else None
+	gzip_path = shutil.which('gzip') if args.svgz else None
+
+	if args.svgo and not svgo_path:
 		print('Error: svgo executable not found in the system.', file=stderr)
-	if args.svgz and gzip_path is None:
+	if args.svgz and not gzip_path:
 		print('Error: gzip executable not found in the system.', file=stderr)
 
-	svg_files = [file for path in args.paths for file in find_svg_files(path)]
+	svg_files = [file for path in args.paths for file in find_svg_files(path, args.recursive)]
 
 	for file in svg_files:
-		simple_compress(file)
+		simple_compress(file, args.remove_fill)
 
-	if args.svgo and svgo_path is not None:
+	if args.svgo and svgo_path:
 		svgo_arguments = [svgo_path, '-q'] + svg_files
 		try:
 			subprocess.run(svgo_arguments, check=True)
@@ -134,11 +123,10 @@ def main():
 		except subprocess.CalledProcessError as e:
 			print(f'Error during SVGO optimization for files {svg_files}: {e}', file=stderr)
 
-	if args.svgz and gzip_path is not None:
+	if args.svgz and gzip_path:
 		for file in svg_files:
-			compress_to_svgz(file)
+			compress_to_svgz(file, gzip_path)
 
 
 if __name__ == '__main__':
-	parse_arguments()
 	main()
