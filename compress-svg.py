@@ -20,20 +20,20 @@ import subprocess
 from sys import stderr
 
 
-def simple_compress(filepath: str, remove_fill: bool):
+def default_optimize(filepath: str, remove_fill: bool):
 
 	# Define regular expressions once and store them as attributes of the function
-	if not hasattr(simple_compress, 'RE_FILL'):
-		simple_compress.RE_FILL = re.compile(r'fill="[^"]*"')
-		simple_compress.RE_XLINK_HREF = re.compile(r'xlink:href')
-		simple_compress.RE_XMLNS_XLINK = re.compile(r'\s+xmlns:xlink="[^"]*"')
-		simple_compress.RE_COMMENT = re.compile(r'<!--.*?-->', flags=re.DOTALL)
-		simple_compress.RE_XML_TAG = re.compile(r'<\?xml.*?>', flags=re.DOTALL)
-		simple_compress.RE_DOCTYPE_SVG = re.compile(r'<!DOCTYPE svg[^>]*>')
-		simple_compress.RE_WHITESPACE = re.compile(r'\s+')
-		simple_compress.RE_WHITESPACE_AROUND_TAGS = re.compile(r'\s*([<>])\s*')
-		simple_compress.RE_SYMBOLS_BETWEEN_TAGS = re.compile(r'>[^<]+<')
-		simple_compress.RE_XML_SPACE = re.compile(r'\s+xml:space="[^"]+"')
+	if not hasattr(default_optimize, 'RE_FILL'):
+		default_optimize.RE_FILL = re.compile(r'fill="[^"]*"')
+		default_optimize.RE_XLINK_HREF = re.compile(r'xlink:href')
+		default_optimize.RE_XMLNS_XLINK = re.compile(r'\s+xmlns:xlink="[^"]*"')
+		default_optimize.RE_COMMENT = re.compile(r'<!--.*?-->', flags=re.DOTALL)
+		default_optimize.RE_XML_TAG = re.compile(r'<\?xml.*?>', flags=re.DOTALL)
+		default_optimize.RE_DOCTYPE_SVG = re.compile(r'<!DOCTYPE svg[^>]*>')
+		default_optimize.RE_WHITESPACE = re.compile(r'\s+')
+		default_optimize.RE_WHITESPACE_AROUND_TAGS = re.compile(r'\s*([<>])\s*')
+		default_optimize.RE_SYMBOLS_BETWEEN_TAGS = re.compile(r'>[^<]+<')
+		default_optimize.RE_XML_SPACE = re.compile(r'\s+xml:space="[^"]+"')
 
 	with open(filepath, 'r', encoding='utf-8') as file:
 		content = file.read()
@@ -42,23 +42,23 @@ def simple_compress(filepath: str, remove_fill: bool):
 	content = content.strip()
 	# If remove_fill is set, removing "fill" attributes
 	if remove_fill:
-		content = simple_compress.RE_FILL.sub('', content)
+		content = default_optimize.RE_FILL.sub('', content)
 	# If there is no xlink use, removing redundant "xmlns:xlink" attribute
-	if simple_compress.RE_XLINK_HREF.search(content) is None:
-		content = simple_compress.RE_XMLNS_XLINK.sub('', content)
+	if default_optimize.RE_XLINK_HREF.search(content) is None:
+		content = default_optimize.RE_XMLNS_XLINK.sub('', content)
 	# Removing comments
-	content = simple_compress.RE_COMMENT.sub('', content)
+	content = default_optimize.RE_COMMENT.sub('', content)
 	# Removing "<?xml" tag
-	content = simple_compress.RE_XML_TAG.sub('', content)
+	content = default_optimize.RE_XML_TAG.sub('', content)
 	# Removing "<!DOCTYPE svg" tag
-	content = simple_compress.RE_DOCTYPE_SVG.sub('', content)
+	content = default_optimize.RE_DOCTYPE_SVG.sub('', content)
 	# Replacing whitespace with single space
-	content = simple_compress.RE_WHITESPACE.sub(' ', content)
+	content = default_optimize.RE_WHITESPACE.sub(' ', content)
 	# Removing spaces around angle brackets
-	content = simple_compress.RE_WHITESPACE_AROUND_TAGS.sub(r'\1', content)
+	content = default_optimize.RE_WHITESPACE_AROUND_TAGS.sub(r'\1', content)
 	# If there are no other symbols between angle brackets, removing redundant "xml:space" attribute
-	if simple_compress.RE_SYMBOLS_BETWEEN_TAGS.search(content) is None:
-		content = simple_compress.RE_XML_SPACE.sub('', content)
+	if default_optimize.RE_SYMBOLS_BETWEEN_TAGS.search(content) is None:
+		content = default_optimize.RE_XML_SPACE.sub('', content)
 
 	with open(filepath, 'w', encoding='utf-8') as file:
 		file.write(content)
@@ -100,6 +100,7 @@ def main():
 	parser.add_argument('-f', '--remove-fill', action='store_true', help='Remove fill="..." attributes.')
 	parser.add_argument('--svgo', action='store_true', help='Use svgo if it exists in the system.')
 	parser.add_argument('--svgz', action='store_true', help='Compress to .svgz format with gzip utility after processing.')
+	parser.add_argument('--no-default', action='store_true', help='Skip default optimizations.')
 
 	args = parser.parse_args()
 
@@ -111,10 +112,15 @@ def main():
 	if args.svgz and not gzip_path:
 		print('Error: gzip executable not found in the system.', file=stderr)
 
+	if args.no_default and not svgo_path and not gzip_path:
+		# There is nothing to do
+		return
+
 	svg_files = list(set(file for path in args.paths for file in find_svg_files(path, args.recursive)))
 
-	for file in svg_files:
-		simple_compress(file, args.remove_fill)
+	if not args.no_default:
+		for file in svg_files:
+			default_optimize(file, args.remove_fill)
 
 	if args.svgo and svgo_path:
 		svgo_arguments = [svgo_path, '-q'] + svg_files

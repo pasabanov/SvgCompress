@@ -32,7 +32,8 @@ python compress-svg.py [options] paths
 `-r`, `--recursive` Обрабатывать директории рекурсивно  
 `-f`, `--remove-fill` Удалить атрибуты `fill="..."`   
 `--svgo` Использовать [SVGO](https://github.com/svg/svgo), если он установлен в системе  
-`--svgz` Сжать в формат [.svgz](https://ru.wikipedia.org/wiki/SVG#SVGZ) с помощью утилиты [gzip](https://www.gnu.org/software/gzip/) после обработки
+`--svgz` Сжать в формат [.svgz](https://ru.wikipedia.org/wiki/SVG#SVGZ) с помощью утилиты [gzip](https://www.gnu.org/software/gzip/) после обработки  
+`--no-default` Не выполнять оптимизаций по умолчанию (если вы хотите использовать только [SVGO](https://github.com/svg/svgo), [gzip](https://www.gnu.org/software/gzip/) или оба)
 
 ## Примеры
 1. Сжать один SVG-файл:

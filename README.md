@@ -32,7 +32,8 @@ python compress-svg.py [options] paths
 `-r`, `--recursive` Recursively process directories  
 `-f`, `--remove-fill` Remove `fill="..."` attributes  
 `--svgo` Use [SVGO](https://github.com/svg/svgo) if it exists in the system  
-`--svgz` Compress to [.svgz](https://ru.wikipedia.org/wiki/SVG#SVGZ) format with [gzip](https://www.gnu.org/software/gzip/) utility after processing
+`--svgz` Compress to [.svgz](https://ru.wikipedia.org/wiki/SVG#SVGZ) format with [gzip](https://www.gnu.org/software/gzip/) utility after processing  
+`--no-default` Do not perform default optimizations (in case you only want to use [SVGO](https://github.com/svg/svgo), [gzip](https://www.gnu.org/software/gzip/) or both)
 
 ## Examples
 1. Compress a single SVG file:
