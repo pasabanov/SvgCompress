@@ -99,45 +99,20 @@ def compress_to_svgz(filepath):
 		print(f'Error compressing {filepath} to .svgz: {e}', file=stderr)
 
 
-def traverse_directory(directory, target_function):
-	for root, _, files in os.walk(directory):
+def find_svg_files(path):
+	if os.path.isfile(path) and path.endswith('.svg'):
+		return [path]
+	elif not os.path.isdir(path):
+		print(f'Error: {path} is neither an SVG file nor a directory.', file=stderr)
+		return []
+	svg_files = []
+	for root, _, files in os.walk(path):
 		for filename in files:
 			if filename.endswith('.svg'):
-				filepath = os.path.join(root, filename)
-				target_function(filepath)
+				svg_files.append(os.path.join(root, filename))
 		if not args.recursive:
 			break
-
-
-def process_path(path):
-	if os.path.isfile(path) and path.endswith('.svg'):
-		is_directory = False
-	elif os.path.isdir(path):
-		is_directory = True
-	else:
-		print(f'Error: {path} is neither an SVG file nor a directory.', file=stderr)
-		return
-
-	if is_directory:
-		traverse_directory(path, simple_compress)
-	else:
-		simple_compress(path)
-
-	if args.svgo and svgo_path is not None:
-		svgo_arguments = [svgo_path, '-q', path]
-		if is_directory and args.recursive:
-			svgo_arguments.append('-r')
-		try:
-			subprocess.run(svgo_arguments, check=True)
-			subprocess.run(svgo_arguments, check=True) # Second time for additional optimization
-		except subprocess.CalledProcessError as e:
-			print(f'Error during SVGO optimization for {path}: {e}', file=stderr)
-
-	if args.svgz and gzip_path is not None:
-		if is_directory:
-			traverse_directory(path, compress_to_svgz)
-		else:
-			compress_to_svgz(path)
+	return svg_files
 
 
 def main():
@@ -145,8 +120,23 @@ def main():
 		print('Error: svgo executable not found in the system.', file=stderr)
 	if args.svgz and gzip_path is None:
 		print('Error: gzip executable not found in the system.', file=stderr)
-	for path in args.paths:
-		process_path(path)
+
+	svg_files = [file for path in args.paths for file in find_svg_files(path)]
+
+	for file in svg_files:
+		simple_compress(file)
+
+	if args.svgo and svgo_path is not None:
+		svgo_arguments = [svgo_path, '-q'] + svg_files
+		try:
+			subprocess.run(svgo_arguments, check=True)
+			subprocess.run(svgo_arguments, check=True) # Second time for additional optimization
+		except subprocess.CalledProcessError as e:
+			print(f'Error during SVGO optimization for files {svg_files}: {e}', file=stderr)
+
+	if args.svgz and gzip_path is not None:
+		for file in svg_files:
+			compress_to_svgz(file)
 
 
 if __name__ == '__main__':
