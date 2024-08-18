@@ -98,9 +98,9 @@ def main():
 	parser.add_argument('-v', '--version', action='version', version='SVG Compressor 1.0', help='Show the version of the script.')
 	parser.add_argument('-r', '--recursive', action='store_true', help='Recursively process directories.')
 	parser.add_argument('-f', '--remove-fill', action='store_true', help='Remove fill="..." attributes.')
-	parser.add_argument('--svgo', action='store_true', help='Use svgo if it exists in the system.')
-	parser.add_argument('--svgz', action='store_true', help='Compress to .svgz format with gzip utility after processing.')
-	parser.add_argument('--no-default', action='store_true', help='Skip default optimizations.')
+	parser.add_argument('-o', '--svgo', action='store_true', help='Use svgo if it exists in the system.')
+	parser.add_argument('-z', '--svgz', action='store_true', help='Compress to .svgz format with gzip utility after processing.')
+	parser.add_argument('-n', '--no-default', action='store_true', help='Skip default optimizations.')
 
 	args = parser.parse_args()
 

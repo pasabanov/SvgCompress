@@ -8,10 +8,10 @@
 
 1. **Clone the repository:**
 
-    ```sh
-    git clone https://github.com/pasabanov/SvgCompress
-    cd SvgCompress
-    ```
+	```sh
+	git clone https://github.com/pasabanov/SvgCompress
+	cd SvgCompress
+	```
 
 2. **(Optional) If you want to use `--svgo` option, make sure [SVGO](https://github.com/svg/svgo) is installed.**
 
@@ -31,33 +31,37 @@ python compress-svg.py [options] paths
 `-v`, `--version` Show the version of the script  
 `-r`, `--recursive` Recursively process directories  
 `-f`, `--remove-fill` Remove `fill="..."` attributes  
-`--svgo` Use [SVGO](https://github.com/svg/svgo) if it exists in the system  
-`--svgz` Compress to [.svgz](https://ru.wikipedia.org/wiki/SVG#SVGZ) format with [gzip](https://www.gnu.org/software/gzip/) utility after processing  
-`--no-default` Do not perform default optimizations (in case you only want to use [SVGO](https://github.com/svg/svgo), [gzip](https://www.gnu.org/software/gzip/) or both)
+`-o`, `--svgo` Use [SVGO](https://github.com/svg/svgo) if it exists in the system  
+`-z`, `--svgz` Compress to [.svgz](https://ru.wikipedia.org/wiki/SVG#SVGZ) format with [gzip](https://www.gnu.org/software/gzip/) utility after processing  
+`-n`, `--no-default` Do not perform default optimizations (in case you only want to use [SVGO](https://github.com/svg/svgo), [gzip](https://www.gnu.org/software/gzip/) or both)
 
 ## Examples
 1. Compress a single SVG file:
-    ```sh
-    python compress-svg.py my-icon.svg
-    ```
+	```sh
+	python compress-svg.py my-icon.svg
+	```
 2. Compress all SVG files in some directories and files:
-    ```sh
-    python compress-svg.py my-icons-directory1 my-icon.svg directory2 icon2.svg
-    ```
+	```sh
+	python compress-svg.py my-icons-directory1 my-icon.svg directory2 icon2.svg
+	```
 3. Compress all SVG files in a directory and all subdirectories:
-    ```sh
-    python compress-svg.py -r my-icons-directory
+	```sh
+	python compress-svg.py -r my-icons-directory
    ```
 4. Compress a SVG file removing every `fill=...` attribute in it (making it monocolor):
-    ```sh
-    python compress-svg.py -f my-icon.svg
-    ```
-5. Using `ls-sizes.py` to compare the sizes:
-    ```sh
-    cp -r icons/ compressed-icons/
-    python compress-svg.py [options] compressed-icons
-    python ls-sizes.py
-    ```
+	```sh
+	python compress-svg.py -f my-icon.svg
+	```
+5. Compress all SVG files in a directory and all subdirectories, removing `fill` attributes, then optimize with SVGO, then compress to .svgz with gzip:
+	```sh
+	pythoon compress-svg.py -rfoz my-icons-directory
+	```
+6. Using `ls-sizes.py` to compare the sizes:
+	```sh
+	cp -r icons/ compressed-icons/
+	python compress-svg.py [options] compressed-icons
+	python ls-sizes.py
+	```
 
 ## License
 
