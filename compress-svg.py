@@ -38,24 +38,25 @@ def simple_compress(filepath: str, remove_fill: bool):
 	with open(filepath, 'r', encoding='utf-8') as file:
 		content = file.read()
 
-	# Deleting whitespace at the ends
+	# Removing leading and trailing whitespace
 	content = content.strip()
+	# If remove_fill is set, removing "fill" attributes
 	if remove_fill:
 		content = simple_compress.RE_FILL.sub('', content)
-	# If there is no xlink use, delete redundant attribute
+	# If there is no xlink use, removing redundant "xmlns:xlink" attribute
 	if simple_compress.RE_XLINK_HREF.search(content) is None:
 		content = simple_compress.RE_XMLNS_XLINK.sub('', content)
-	# Deleting comments
+	# Removing comments
 	content = simple_compress.RE_COMMENT.sub('', content)
-	# Deleting "<?xml" tag
+	# Removing "<?xml" tag
 	content = simple_compress.RE_XML_TAG.sub('', content)
-	# Deleting "<!DOCTYPE svg" tag
+	# Removing "<!DOCTYPE svg" tag
 	content = simple_compress.RE_DOCTYPE_SVG.sub('', content)
 	# Replacing whitespace with single space
 	content = simple_compress.RE_WHITESPACE.sub(' ', content)
 	# Removing spaces around angle brackets
 	content = simple_compress.RE_WHITESPACE_AROUND_TAGS.sub(r'\1', content)
-	# If there are no other symbols between angle brackets, delete redundant attribute
+	# If there are no other symbols between angle brackets, removing redundant "xml:space" attribute
 	if simple_compress.RE_SYMBOLS_BETWEEN_TAGS.search(content) is None:
 		content = simple_compress.RE_XML_SPACE.sub('', content)
 
