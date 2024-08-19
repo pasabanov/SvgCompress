@@ -94,7 +94,7 @@ def find_svg_files(path: str, recursive: bool):
 
 def main():
 	parser = argparse.ArgumentParser(description='Compress SVG files by removing unnecessary whitespace, comments, metadata and some other data.')
-	parser.add_argument('paths', nargs='+', help='List of directories or SVG files to compress.')
+	parser.add_argument('paths', nargs='+', help='List of SVG files or directories or SVG files to compress.')
 	parser.add_argument('-v', '--version', action='version', version='SVG Compressor 1.0', help='Show the version of the script.')
 	parser.add_argument('-r', '--recursive', action='store_true', help='Recursively process directories.')
 	parser.add_argument('-f', '--remove-fill', action='store_true', help='Remove fill="..." attributes.')
