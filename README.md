@@ -1,5 +1,7 @@
 # SvgCompress
 
+See also the Rust version: [SvgCompress-rs](https://github.com/pasabanov/svgCompress-rs).
+
 ## Description
 
 `SvgCompress` is a tool for compressing SVG files by removing unnecessary whitespace, comments, metadata and some other data. It also supports optimization with [SVGO](https://github.com/svg/svgo) and compression into [SVGZ](https://ru.wikipedia.org/wiki/SVG#SVGZ). The tool helps reduce the file size and clean up SVG files for better performance and preparing for release versions.
