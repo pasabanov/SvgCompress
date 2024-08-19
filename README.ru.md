@@ -54,7 +54,7 @@ python compress-svg.py [options] paths
 	```
 5. Сжать все SVG-файлы в директории и её поддиректориях, удаляя атрибуты `fill`, затем оптимизировать с помощью SVGO, затем сжать в .svgz с помощью gzip:
 	```sh
-	pythoon compress-svg.py -rfoz my-icons-directory
+	python compress-svg.py -rfoz my-icons-directory
 	```
 6. Сравнить размеры файлов до и после сжатия с помощью `ls-sizes.py`:
 	```sh
