@@ -1,26 +1,25 @@
-### PR Type
-What kind of change does this PR introduce?
+*Please complete the relevant sections and remove any that don't apply.*  
+*Remember to delete this instruction before submitting your PR.*
 
+**PR Type**
 - [ ] Bug fix
 - [ ] Feature
-- [ ] Chore (refactoring, formatting, local variables, other cleanup)
-- [ ] Documentation content changes
+- [ ] Documentation
+- [ ] Localization / Internationalization
+- [ ] Chore (refactoring, formatting, cleanup, etc.)
 - [ ] Other (please describe): _______
 
-### What is the current behavior?
+**Describe changes**  
+Please describe the changes you have made.
+
+**What is the current behavior?**  
 Please describe the current behavior that you are modifying, or link to a relevant issue.
 
-### What is the new behavior?
+**What is the new behavior?**  
 Please describe the new behavior.
 
-### Does this PR introduce a breaking change?
-- [ ] Yes
-- [ ] No
-
-If this PR contains a breaking change, please describe the impact and migration path for existing applications below.
-
-### How to test
+**How to test**  
 Describe the steps to test this PR, if applicable.
 
-### Other information
+**Other information**  
 Add any other information here.
